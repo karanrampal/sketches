@@ -1,0 +1,23 @@
+# Project specific
+numpy
+torch
+torchvision
+matplotlib
+pandas
+tqdm
+mlflow
+pyyaml
+
+# Databricks
+databricks-cli
+
+# Linting / Formating
+mypy
+pylint
+isort
+black
+
+# Testing
+pytest
+pytest-cov
+pytest-mock
