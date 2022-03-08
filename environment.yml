@@ -1,0 +1,26 @@
+name: sketches-env
+channels:
+  - pytorch
+dependencies:
+  - python=3.8
+  - ipykernel
+  - build
+  - numpy
+  - matplotlib
+  - pyyaml
+  - pytorch
+  - torchvision
+  - cpuonly  # replace with cudatoolkit=10.2 or cudatoolkit=11.3 if you have a gpu
+  - pandas
+  - tensorboard
+  - tqdm
+  - databricks-cli
+  - pytest
+  - pytest-cov
+  - pytest-mock
+  - mypy
+  - pylint
+  - black
+  - isort
+  - pip:
+    - torch-tb-profiler
