@@ -12,6 +12,7 @@ dependencies:
   - torchvision
   - cpuonly  # replace with cudatoolkit=10.2 or cudatoolkit=11.3 if you have a gpu
   - pandas
+  - openpyxl
   - tensorboard
   - tqdm
   - databricks-cli
