@@ -13,6 +13,7 @@ dependencies:
   - cpuonly  # replace with cudatoolkit=10.2 or cudatoolkit=11.3 if you have a gpu
   - pandas
   - openpyxl
+  - scikit-learn
   - tensorboard
   - tqdm
   - databricks-cli
