@@ -3,7 +3,7 @@
 import errno
 import logging
 import os
-from typing import Dict, Union
+from typing import Any, Dict, Union
 import shutil
 
 import torch
@@ -19,7 +19,7 @@ class Params:
     def save(self, yaml_path: str) -> None:
         """Save parameters to yaml file at yaml_path
         """
-        with open(yaml_path, 'w', encoding='utf-8') as fptr:
+        with open(yaml_path, "w", encoding="utf-8") as fptr:
             yaml.safe_dump(self.__dict__, fptr)
 
     def update(self, inp: Union[Dict, str]) -> None:
@@ -28,7 +28,7 @@ class Params:
         if isinstance(inp, dict):
             self.__dict__.update(inp)
         elif isinstance(inp, str):
-            with open(inp, encoding='utf-8') as fptr:
+            with open(inp, encoding="utf-8") as fptr:
                 params = yaml.safe_load(fptr)
                 self.__dict__.update(params)
         else:
@@ -36,64 +36,64 @@ class Params:
             f"Input should either be a dictionary or a string path to a config file!"
         )
 
-def set_logger(log_path):
+def set_logger(log_path: str) -> None:
     """Set the logger to log info in terminal and file at log_path.
     Args:
-        log_path: (string) location of log file
+        log_path: Location of log file
     """
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
     if not logger.handlers:
         # Logging to a file
-        file_handler = logging.FileHandler(log_path, mode='w')
-        file_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
+        file_handler = logging.FileHandler(log_path, mode="w")
+        file_handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s: %(message)s"))
         logger.addHandler(file_handler)
 
         # Logging to console
         stream_handler = logging.StreamHandler()
-        stream_handler.setFormatter(logging.Formatter('%(message)s'))
+        stream_handler.setFormatter(logging.Formatter("%(message)s"))
         logger.addHandler(stream_handler)
 
-def save_checkpoint(state, is_best, checkpoint):
+def save_checkpoint(state: Dict[str, Any], is_best: bool, checkpoint: str) -> None:
     """Saves model at checkpoint
     Args:
-        state: (dict) contains model's state_dict, epoch, optimizer state_dict etc.
-        is_best: (bool) True if it is the best model seen till now
-        checkpoint: (string) folder where parameters are to be saved
+        state: Contains model's state_dict, epoch, optimizer state_dict etc.
+        is_best: True if it is the best model seen till now
+        checkpoint: Folder where parameters are to be saved
     """
-    filepath = os.path.join(checkpoint, 'last.pth.tar')
+    filepath = os.path.join(checkpoint, "last.pth.tar")
     safe_makedir(checkpoint)
     torch.save(state, filepath)
     if is_best:
-        shutil.copyfile(filepath, os.path.join(checkpoint, 'best.pth.tar'))
+        shutil.copyfile(filepath, os.path.join(checkpoint, "best.pth.tar"))
 
-def load_checkpoint(checkpoint, model, optimizer=None):
+def load_checkpoint(checkpoint: str, model: torch.nn.Module, optimizer: torch.optim = None):
     """Loads model state_dict from checkpoint.
     Args:
-        checkpoint: (string) filename which needs to be loaded
-        model: (torch.nn.Module) model for which the parameters are loaded
-        optimizer: (torch.optim) optional: resume optimizer from checkpoint
+        checkpoint: Filename which needs to be loaded
+        model: Model for which the parameters are loaded
+        optimizer: Resume optimizer from checkpoint, optional
     """
     if not os.path.exists(checkpoint):
         raise FileNotFoundError(errno.ENOENT,
                                 os.strerror(errno.ENOENT),
                                 checkpoint)
     checkpoint = torch.load(checkpoint)
-    model.load_state_dict(checkpoint['state_dict'])
+    model.load_state_dict(checkpoint["state_dict"])
 
     if optimizer:
-        optimizer.load_state_dict(checkpoint['optim_dict'])
+        optimizer.load_state_dict(checkpoint["optim_dict"])
 
     return checkpoint
 
-def safe_makedir(path):
+def safe_makedir(path: str) -> None:
     """Make directory given the path if it doesn't already exist
     Args:
-        path: path of the directory to be made
+        path: Path of the directory to be made
     """
     if not os.path.exists(path):
-        print("Directory doesn't exist! Making directory {0}.".format(path))
+        print(f"Directory doesn't exist! Making directory {path}.")
         os.makedirs(path)
     else:
-        print("Directory {0} Exists!".format(path))
+        print(f"Directory {path} Exists!")
