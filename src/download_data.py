@@ -46,7 +46,7 @@ def main() -> None:
 
     logging.info("Fix image ID's...")
     mask = fetch_data["Image Id"].duplicated()
-    fetch_data["Image Id"] = fetch_data["Image Id"].astype("str")
+    fetch_data["Image Id"] = "img_" + fetch_data["Image Id"].astype("str")
     fetch_data.loc[mask, "Image Id"] += "_1"
     logging.info(f"Unique URL's %d", fetch_data["Image URL"].nunique())
     logging.info(f"Unique ID's %d", fetch_data["Image Id"].nunique())

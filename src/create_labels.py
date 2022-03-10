@@ -67,7 +67,7 @@ def main() -> None:
 
     logging.info("Fixing Image Id's...")
     mask = fetch_data["Image Id"].duplicated()
-    fetch_data["Image Id"] = fetch_data["Image Id"].astype("str")
+    fetch_data["Image Id"] = "img_" + fetch_data["Image Id"].astype("str")
     fetch_data.loc[mask, "Image Id"] += "_1"
 
     del_cols = ["Image URL", "Image Name", "Product Number", "Garment group", "Department Name", "Seasonold", "UniquieVal"]
