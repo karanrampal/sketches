@@ -54,14 +54,13 @@ def get_transform(mode: str, params: Params) -> tvt.Compose:
     Returns:
         Composition of all the data transforms
     """
-    trans = []
-    trans.append(
+    trans = [
         tvt.Resize((params.height, params. width)),
         tvt.ToTensor(),
         tvt.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    )
+    ]
     if mode == "train":
-        trans.append(
+        trans += [
             tvt.RandomHorizontalFlip(params.flip),
             tvt.ColorJitter(
                 brightness=params.brightness,
@@ -70,7 +69,7 @@ def get_transform(mode: str, params: Params) -> tvt.Compose:
                 hue=params.hue
             ),
             tvt.RandomRotation(params.degree)
-        )
+        ]
     return tvt.Compose(trans)
 
 
