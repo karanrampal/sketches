@@ -1,9 +1,10 @@
 """Utility functions for distributed computing"""
 
+from collections import deque
 import errno
 import logging
 import os
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 import shutil
 
 import torch
@@ -97,3 +98,53 @@ def safe_makedir(path: str) -> None:
         os.makedirs(path)
     else:
         print(f"Directory {path} Exists!")
+
+
+class SmoothedValue:
+    """Track a series of values and provide access to smoothed values over a
+    window or the global series average.
+    """
+
+    def __init__(self, window_size: int = 20, fmt: Optional[str] = None) -> None:
+        if fmt is None:
+            fmt = "{median:.4f} ({global_avg:.4f})"
+        self.deque = deque(maxlen=window_size)
+        self.total = 0.0
+        self.count = 0
+        self.fmt = fmt
+
+    def update(self, value: Any, n: int = 1) -> None:
+        self.deque.append(value)
+        self.count += n
+        self.total += value * n
+
+    @property
+    def median(self) -> Union[int, float]:
+        d = torch.tensor(list(self.deque))
+        return d.median().item()
+
+    @property
+    def avg(self) -> Union[int, float]:
+        d = torch.tensor(list(self.deque), dtype=torch.float32)
+        return d.mean().item()
+
+    @property
+    def global_avg(self) -> Union[int, float]:
+        return self.total / self.count
+
+    @property
+    def max(self) -> Union[int, float]:
+        return max(self.deque)
+
+    @property
+    def value(self) -> Union[int, float]:
+        return self.deque[-1]
+
+    def __str__(self) -> str:
+        return self.fmt.format(
+            median=self.median,
+            avg=self.avg,
+            global_avg=self.global_avg,
+            max=self.max,
+            value=self.value,
+        )
