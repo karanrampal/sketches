@@ -186,7 +186,7 @@ def main() -> None:
     model = Net(params)
     if params.cuda:
         model = model.to(params.device)
-    writer.add_graph(model, next(iter(train_dl))[0])
+    writer.add_graph(model, next(iter(train_dl))[0].to(params.device))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=params.learning_rate)
 
