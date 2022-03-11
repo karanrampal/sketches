@@ -14,7 +14,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 import utils.utils as utils
 from model.net import Net, loss_fn, get_metrics
-import model.data_loader as get_dataloader
+from model.data_loader import get_dataloader
 from evaluate import evaluate
 
 
@@ -24,19 +24,19 @@ def args_parser() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Training utility")
     parser.add_argument(
         "-d",
-        "--data-dir",
+        "--data_dir",
         default="../datasets/sketches",
         help="Directory containing the dataset"
     )
     parser.add_argument(
         "-m",
-        "--model-dir",
+        "--model_dir",
         default="experiments/base_model",
         help="Directory containing params.json file"
     )
     parser.add_argument(
         "-r",
-        "--restore-file",
+        "--restore_file",
         default=None,
         choices=["best", "last"],
         help="Optional, name of the file in --model_dir containing weights to restore"
