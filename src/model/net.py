@@ -28,7 +28,7 @@ class Net(tnn.Module):
             in_features=2560,
             out_features=params.num_classes
         )
-        self.dropout_rate = params.dropout_rate
+        self.dropout_rate = params.dropout
 
     def forward(self, x: torch.tensor) -> Tuple[torch.tensor, torch.tensor]:
         """Defines the forward propagation through the network
