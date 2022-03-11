@@ -10,7 +10,7 @@ dependencies:
   - pyyaml
   - pytorch
   - torchvision
-  - cpuonly  # replace with cudatoolkit=10.2 or cudatoolkit=11.3 if you have a gpu
+  - cpuonly  # replace with cudatoolkit=11.3 if you have a gpu
   - pandas
   - openpyxl
   - scikit-learn
