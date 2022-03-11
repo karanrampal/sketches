@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 from PIL import Image
+import torch
 from torch.utils.data import DataLoader, Dataset
 import torchvision.transforms as tvt
 
@@ -36,10 +37,10 @@ class SketchesDataset(Dataset):
         row = self.data.iloc[idx]
 
         im_name = row["Image Id"] + ".png"
-        im_path = os.path.join(self.root, im_name)
+        im_path = os.path.join(self.root, "images", im_name)
         img = Image.open(im_path).convert("RGB")
 
-        labels = row[1:].values
+        labels = torch.tensor(row[1:])
 
         if self.transform is not None:
             img = self.transform(img)
@@ -55,7 +56,7 @@ def get_transform(mode: str, params: Params) -> tvt.Compose:
         Composition of all the data transforms
     """
     trans = [
-        tvt.Resize((params.height, params. width)),
+        tvt.Resize((params.height, params.width)),
         tvt.ToTensor(),
         tvt.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ]
@@ -71,6 +72,15 @@ def get_transform(mode: str, params: Params) -> tvt.Compose:
             tvt.RandomRotation(params.degree)
         ]
     return tvt.Compose(trans)
+
+
+def collate_fn(batch):
+    """Collate function to create a batch of data
+    """
+    data = list(zip(*batch))
+    imgs = torch.stack(data[0], 0)
+    labels = torch.stack(data[1], 0)
+    return imgs, labels
 
 
 def get_dataloader(
@@ -95,7 +105,7 @@ def get_dataloader(
             shuf = False
 
         dataset = SketchesDataset(
-            root=params.data_path,
+            root=params.data_dir,
             csv_file=mode + "_sketches_" + params.type + ".csv",
             transform=trans
         )
@@ -104,6 +114,7 @@ def get_dataloader(
             batch_size=params.batch_size,
             num_workers=params.num_workers,
             pin_memory=params.pin_memory,
+            collate_fn=collate_fn,
             shuffle=shuf
         )
 
