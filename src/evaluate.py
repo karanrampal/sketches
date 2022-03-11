@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import utils.utils as utils
 from model.net import Net, loss_fn, get_metrics
-import model.data_loader as get_dataloader
+from model.data_loader import get_dataloader
 
 
 def args_parser() -> argparse.Namespace:
@@ -106,7 +106,7 @@ def main() -> None:
 
     logging.info("Loading the dataset...")
 
-    dataloaders = get_dataloader(["test"], args.data_dir, params)
+    dataloaders = get_dataloader(["test"], params)
     test_dl = dataloaders["test"]
 
     logging.info("- done.")
