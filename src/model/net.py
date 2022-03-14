@@ -56,7 +56,7 @@ def loss_fn(outputs: torch.tensor, ground_truth: torch.tensor) -> torch.tensor:
     return loss
 
 
-def avg_acc_gpu(outputs: torch.tensor, labels: torch.tensor, thr: float = 0.5) -> torch.tensor:
+def avg_acc_gpu(outputs: torch.tensor, labels: torch.tensor, thr: float = 0.5) -> float:
     """Compute the accuracy, given the outputs and labels for all images.
     Args:
         outputs: Logits of the network
@@ -65,8 +65,10 @@ def avg_acc_gpu(outputs: torch.tensor, labels: torch.tensor, thr: float = 0.5) -
     Returns:
         average accuracy in [0,1]
     """
+    labels = labels.to(torch.int32)
     outputs = (torch.sigmoid(outputs) > thr).to(torch.int32)
-    return (outputs == labels).sum() / outputs.shape[0]
+    avg_acc = (outputs == labels).sum() / outputs.numel()  # for multi-label else use shape[0]
+    return avg_acc.item()
 
 
 def avg_f1_score_gpu(
@@ -74,7 +76,7 @@ def avg_f1_score_gpu(
     labels: torch.tensor,
     thr: float = 0.5,
     eps: float = 1e-7
-) -> torch.tensor:
+) -> float:
     """Compute the F1 score, given the outputs and labels for all images.
     Args:
         outputs: Logits of the network
@@ -84,6 +86,7 @@ def avg_f1_score_gpu(
     Returns:
         average f1 score
     """
+    labels = labels.to(torch.int32)
     outputs = (torch.sigmoid(outputs) > thr).to(torch.int32)
     tp = (labels * outputs).sum()
     fp = ((1 - labels) * outputs).sum()
@@ -93,7 +96,7 @@ def avg_f1_score_gpu(
     recall = tp / (tp + fn + eps)
     f1 = 2 * (precision * recall) / (precision + recall + eps)
 
-    return f1
+    return f1.item()
 
 
 # Maintain all metrics required during training and evaluation.
