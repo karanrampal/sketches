@@ -40,7 +40,7 @@ class SketchesDataset(Dataset):
         im_path = os.path.join(self.root, "images", im_name)
         img = Image.open(im_path).convert("RGB")
 
-        labels = torch.tensor(row[1:])
+        labels = torch.tensor(row[1:], dtype=torch.float32)
 
         if self.transform is not None:
             img = self.transform(img)
