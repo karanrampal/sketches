@@ -63,8 +63,8 @@ def evaluate(
                 labels = labels.to(params.device)
 
             # compute model output
-            output = model(inp_data)
-            loss = criterion(output, labels, params)
+            _, output = model(inp_data)
+            loss = criterion(output, labels)
 
             # compute all metrics on this batch
             summary_batch = {metric: metrics[metric](output, labels) for metric in metrics}
