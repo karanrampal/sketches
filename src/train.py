@@ -48,6 +48,7 @@ def train(
     model: torch.nn.Module,
     optimizer: torch.optim,
     criterion: Callable,
+    scheduler: torch.optim.lr_scheduler,
     dataloader: DataLoader,
     metrics: Dict[str, Any],
     params: utils.Params,
@@ -59,6 +60,7 @@ def train(
         model: Neural network
         optimizer: Optimizer for parameters of model
         criterion: A function that computes the loss for the batch
+        scheduler: Learning rate scheduler
         dataloader: Training data
         metrics: A dictionary of metrics
         params: Hyperparameters
@@ -99,6 +101,7 @@ def train(
 
         data_iterator.set_postfix(loss=f"{loss_avg}")
 
+    scheduler.step()
     metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]}
     metrics_string = " ; ".join(f"{k}: {v:05.3f}" for k, v in metrics_mean.items())
     logging.info("- Train metrics: %s", metrics_string)
@@ -110,6 +113,7 @@ def train_and_evaluate(
     val_dataloader: DataLoader,
     optimizer: torch.optim,
     criterion: Callable,
+    scheduler: torch.optim.lr_scheduler,
     metrics: Dict[str, Any],
     params: utils.Params,
     writer: SummaryWriter,
@@ -121,6 +125,7 @@ def train_and_evaluate(
         val_dataloader: Validation dataloader
         optimizer: Optimizer for parameters of model
         criterion: A function to compute the loss for the batch
+        scheduler: Learning rate scheduler
         metrics: A dictionary of metric functions
         params: Hyperparameters
         writer : Summary writer for tensorboard
@@ -135,7 +140,7 @@ def train_and_evaluate(
     for epoch in range(params.num_epochs):
         logging.info("Epoch %d / %d", epoch + 1, params.num_epochs)
 
-        train(model, optimizer, criterion, train_dataloader, metrics, params, writer, epoch)
+        train(model, optimizer, criterion, scheduler, train_dataloader, metrics, params, writer, epoch)
 
         val_metrics = evaluate(model, criterion, val_dataloader, metrics, params, writer, epoch)
 
@@ -188,13 +193,26 @@ def main() -> None:
         model = model.to(params.device)
     writer.add_graph(model, next(iter(train_dl))[0].to(params.device))
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=params.learning_rate)
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=params.learning_rate,
+        weight_decay=params.decay
+    )
+    if params.policy == "steps":
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer,
+            milestones=params.steps,
+            gamma=0.1,
+            verbose=True
+        )
+    else:
+        scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9, verbose=True)
 
     criterion = loss_fn
     metrics = get_metrics()
 
     logging.info("Starting training for %d epoch(s)", params.num_epochs)
-    train_and_evaluate(model, train_dl, val_dl, optimizer, criterion, metrics, params,
+    train_and_evaluate(model, train_dl, val_dl, optimizer, criterion, scheduler, metrics, params,
                        writer)
     writer.close()
 
