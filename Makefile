@@ -4,6 +4,9 @@ CONDAENV := environment.yml
 install: environment.yml
 	conda env create -f $(CONDAENV)
 
+build:
+	python -m build
+
 test:
 	pytest -vv --cov
 
