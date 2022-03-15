@@ -51,31 +51,25 @@ def evaluate(
         writer : Summary writer for tensorboard
         epoch: Value of Epoch
     """
-    # put model in evaluation mode
     model.eval()
     summ = []
 
     with torch.no_grad():
         for i, (inp_data, labels) in enumerate(dataloader):
-            # move data to GPU if possible
             if params.cuda:
                 inp_data = inp_data.to(params.device)
                 labels = labels.to(params.device)
 
-            # compute model output
             _, output = model(inp_data)
             loss = criterion(output, labels)
 
-            # compute all metrics on this batch
             summary_batch = {metric: metrics[metric](output, labels) for metric in metrics}
             summary_batch["loss"] = loss.item()
             summ.append(summary_batch)
 
-            # Add to tensorboard
             writer.add_scalar("testing_loss", summary_batch["loss"],
                               epoch * len(dataloader) + i)
 
-    # compute mean of all metrics in summary
     metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]}
     metrics_string = " ; ".join(f"{k}: {v:05.3f}" for k, v in metrics_mean.items())
     logging.info("- Eval metrics : %s", metrics_string)
