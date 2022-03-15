@@ -86,7 +86,7 @@ def main() -> None:
     """Main function
     """
     args = args_parser()
-    params_path = os.path.join(args.model_dir, "params.json")
+    params_path = os.path.join(args.model_dir, "params.yml")
     assert os.path.isfile(params_path), f"No json configuration file found at {params_path}"
     params = utils.Params(params_path)
     params.update(vars(args))
