@@ -13,6 +13,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 import utils.utils as utils
+from utils import dist_utils
 from model.net import Net, loss_fn, get_metrics
 from model.data_loader import get_dataloader
 from evaluate import evaluate
@@ -40,6 +41,17 @@ def args_parser() -> argparse.Namespace:
         default=None,
         choices=["best", "last"],
         help="Optional, name of the file in --model_dir containing weights to restore"
+    )
+    parser.add_argument(
+        "--dist-url",
+        default="env://",
+        type=str,
+        help="url used to set up distributed training",
+    )
+    parser.add_argument(
+        "--amp",
+        action="store_true",
+        help="Use torch.cuda.amp for mixed precision training",
     )
     return parser.parse_args()
 
@@ -162,6 +174,8 @@ def main() -> None:
     """Main function
     """
     args = args_parser()
+    dist_utils.init_distributed_mode(args)
+
     param_path = os.path.join(args.model_dir, "params.yml")
     assert os.path.isfile(param_path), f"No configuration file found at {param_path}"
     params = utils.Params(param_path)
