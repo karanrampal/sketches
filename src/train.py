@@ -157,6 +157,12 @@ def train_and_evaluate(
             logging.info("- Found new best accuracy")
             best_val_acc = val_acc
 
+            best_yml_path = os.path.join(params.model_dir, "metrics_val_best.yml")
+            utils.save_dict_to_yaml(val_metrics, best_yml_path)
+    
+    last_yml_path = os.path.join(params.model_dir, "metrics_val_last.yml")
+    utils.save_dict_to_yaml(val_metrics, last_yml_path)
+
 
 def main() -> None:
     """Main function

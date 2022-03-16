@@ -100,8 +100,8 @@ def main() -> None:
 
     logging.info("Loading the dataset...")
 
-    dataloaders = get_dataloader(["test"], params)
-    test_dl = dataloaders["test"]
+    dataloaders = get_dataloader(["val"], params)
+    test_dl = dataloaders["val"]
 
     logging.info("- done.")
 

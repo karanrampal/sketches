@@ -148,3 +148,13 @@ class SmoothedValue:
             max=self.max,
             value=self.value,
         )
+
+def save_dict_to_yaml(data, yml_path):
+    """Saves a dict of floats to yaml file
+    Args:
+        data: (dict) of float-castable values (np.float, int, float, etc.)
+        yml_path: (string) path to yaml file
+    """
+    with open(yml_path, 'w', encoding='utf-8') as fptr:
+        data = {k: float(v) for k, v in data.items()}
+        yaml.safe_dump(data, fptr)
