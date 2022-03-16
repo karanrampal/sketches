@@ -69,7 +69,7 @@ python create_labels.py -r <path to root dir>
 ```
 Then to start training on a single node with multiple gpu's we can do the following,
 ```
-torchrun --standalone --nnodes=1 --nproc_per_node=<num gpu's> <path to train.py>
+python <path to train.py> --args1 --args2
 ```
 
 ## Requirements
