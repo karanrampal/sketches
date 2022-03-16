@@ -108,7 +108,7 @@ def main() -> None:
     model = Net(params)
     if params.cuda:
         model = model.to(params.device)
-    writer.add_graph(model, next(iter(test_dl))[0])
+    writer.add_graph(model, next(iter(test_dl))[0].to(params.device))
 
     criterion = loss_fn
     metrics = get_metrics()
