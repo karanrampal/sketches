@@ -5,7 +5,6 @@ from typing import Callable, Dict, Tuple
 import torch
 import torch.nn as tnn
 import torchvision.models as models
-from torchvision.models.feature_extraction import create_feature_extractor
 
 from utils.utils import Params
 
@@ -20,12 +19,9 @@ class Net(tnn.Module):
         """
         super(Net, self).__init__()
 
-        model = models.efficientnet_b7(pretrained=True)
-        self.body = create_feature_extractor(model, ["flatten"])
-        for p in self.body.parameters():
-            p.requires_grad = False
-        in_feats = model.classifier[1].in_features
-        self.classifier = tnn.Linear(
+        self.model = models.resnet18(pretrained=True)
+        in_feats = self.model.fc.in_features
+        self.model.fc = tnn.Linear(
             in_features=in_feats,
             out_features=params.num_classes
         )
@@ -38,9 +34,7 @@ class Net(tnn.Module):
         Returns:
             Embeddings and logits
         """
-        embeds = self.body(x)["flatten"]
-        logits = self.classifier(embeds)
-        return embeds, logits
+        return self.model(x)
 
 
 def loss_fn(outputs: torch.tensor, ground_truth: torch.tensor) -> torch.tensor:

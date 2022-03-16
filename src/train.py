@@ -77,7 +77,7 @@ def train(
             train_batch = train_batch.to(params.device)
             labels = labels.to(params.device)
 
-        _, output_batch = model(train_batch)
+        output_batch = model(train_batch)
         loss = criterion(output_batch, labels)
 
         optimizer.zero_grad()
