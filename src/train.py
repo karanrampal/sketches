@@ -94,8 +94,8 @@ def train(
             summary_batch["loss"] = loss.item()
             summ.append(summary_batch)
 
-            writer.add_scalar("training_loss", summary_batch["loss"],
-                              epoch * len(data_iterator) + i)
+            for key, val in summary_batch.items():
+                writer.add_scalar("train_" + key, val, epoch * len(data_iterator) + i)
 
         loss_avg.update(loss.item())
 
@@ -144,7 +144,7 @@ def train_and_evaluate(
 
         val_metrics = evaluate(model, criterion, val_dataloader, metrics, params, writer, epoch)
 
-        val_acc = val_metrics["accuracy"] if "accuracy" in val_metrics else 0.0
+        val_acc = val_metrics.get("f1-score", 0.0)
         is_best = val_acc > best_val_acc
 
         utils.save_checkpoint({"epoch": epoch + 1,

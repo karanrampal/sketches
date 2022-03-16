@@ -67,8 +67,8 @@ def evaluate(
             summary_batch["loss"] = loss.item()
             summ.append(summary_batch)
 
-            writer.add_scalar("testing_loss", summary_batch["loss"],
-                              epoch * len(dataloader) + i)
+            for key, val in summary_batch.items():
+                writer.add_scalar("test_" + key, val, epoch * len(dataloader) + i)
 
     metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]}
     metrics_string = " ; ".join(f"{k}: {v:05.3f}" for k, v in metrics_mean.items())
