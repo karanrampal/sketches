@@ -26,6 +26,7 @@ class SketchesDataset(Dataset):
         self.root = root
         self.data = pd.read_csv(os.path.join(root, csv_file))
         self.transform = transform
+        self.class_names = self.data.columns[1:].values
 
     def __len__(self) -> int:
         """Return the size of the dataset.
